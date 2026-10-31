@@ -1,0 +1,14 @@
+{
+  "name": "claude-cold-cache",
+  "owner": {
+    "name": "Juha Ylitalo",
+    "url": "https://github.com/YlitaloJuha"
+  },
+  "plugins": [
+    {
+      "name": "cold-cache",
+      "source": "./",
+      "description": "See what your next message will cost before you send it, when the prompt cache has gone cold."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "cold-cache",
+  "version": "0.1.0",
+  "description": "See what your next message will cost before you send it, when the prompt cache has gone cold.",
+  "author": {
+    "name": "Juha Ylitalo",
+    "url": "https://github.com/YlitaloJuha"
+  },
+  "types": "./types/index.d.ts",
+  "repository": "https://github.com/YlitaloJuha/claude-cold-cache",
+  "keywords": [
+    "claude-code-mods",
+    "claude-mods",
+    "function-hooks",
+    "mod"
+  ]
+}
