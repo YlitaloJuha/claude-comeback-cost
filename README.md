@@ -11,7 +11,7 @@
 
 <p align="center"><img src="docs/usage.svg" alt="Mock-up of the cold cache row on its own, using the text the mod writes" width="860"></p>
 
-<p align="center"><sub>Mock-up: I could not wait out a real cold cache in a large session. The row text is what the mod writes.</sub></p>
+<p align="center"><sub>Mock-up with the text the mod writes. The row itself was tested live using a copy with a 20-second cache lifetime.</sub></p>
 
 Come back after a long break and one short message can rewrite your whole conversation at the expensive rate. This shows the price above the prompt first. It never blocks you, never pings, and spends nothing.
 
