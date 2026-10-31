@@ -6,6 +6,7 @@
   <img alt="type: Claude Code mod" src="https://img.shields.io/badge/type-Claude%20Code%20mod-6f42c1?style=flat-square">
   <img alt="tested on: Claude Code 2.1.292" src="https://img.shields.io/badge/tested%20on-Claude%20Code%202.1.292-D97757?style=flat-square">
   <img alt="tests: 10 passing" src="https://img.shields.io/badge/tests-10%20passing-2ea44f?style=flat-square">
+  <img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-555?style=flat-square">
 </p>
 
 <p align="center"><img src="docs/usage.svg" alt="Mock-up of the cold cache row on its own, using the text the mod writes" width="860"></p>
@@ -63,8 +64,10 @@ claude --plugin-dir .
 
 ## Credits
 
-- Timing rules are adapted from [cache-tax](https://github.com/karanb192/cache-tax) by Karan Bansal (MIT), see `LICENSE-cache-tax`. Want the cache kept warm instead? Use that.
+- The idea and the timing rules come from [cache-tax](https://github.com/karanb192/cache-tax) by Karan Bansal (MIT), see `LICENSE-cache-tax`. This is the warn-only version. If you want the cache kept warm as well, use cache-tax.
 
-## License
+## License and warranty
 
-Not chosen yet, so all rights are reserved for now. `LICENSE-cache-tax` covers the parts adapted from cache-tax.
+[MIT](LICENSE). `LICENSE-cache-tax` covers the parts adapted from cache-tax.
+
+Provided **as is, with no warranty of any kind**. You use it at your own risk, and the author is not liable for anything that results from using it, including lost work, usage charges or changes to your code.
