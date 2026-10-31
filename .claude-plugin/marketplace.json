@@ -1,12 +1,12 @@
 {
-  "name": "claude-cold-cache",
+  "name": "claude-comeback-cost",
   "owner": {
     "name": "Juha Ylitalo",
     "url": "https://github.com/YlitaloJuha"
   },
   "plugins": [
     {
-      "name": "cold-cache",
+      "name": "comeback-cost",
       "source": "./",
       "description": "See what your next message will cost before you send it, when the prompt cache has gone cold."
     }

@@ -1,5 +1,5 @@
 {
-  "name": "cold-cache",
+  "name": "comeback-cost",
   "version": "0.1.0",
   "description": "See what your next message will cost before you send it, when the prompt cache has gone cold.",
   "author": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/YlitaloJuha"
   },
   "types": "./types/index.d.ts",
-  "repository": "https://github.com/YlitaloJuha/claude-cold-cache",
+  "repository": "https://github.com/YlitaloJuha/claude-comeback-cost",
   "keywords": [
     "claude-code-mods",
     "claude-mods",

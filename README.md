@@ -1,4 +1,4 @@
-<h1 align="center">claude-cold-cache</h1>
+<h1 align="center">claude-comeback-cost</h1>
 
 <p align="center"><b>See what your next message will cost before you send it, when the prompt cache has gone cold.</b></p>
 
@@ -9,7 +9,7 @@
   <img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-555?style=flat-square">
 </p>
 
-<p align="center"><img src="docs/usage.svg" alt="Mock-up of the cold cache row on its own, using the text the mod writes" width="860"></p>
+<p align="center"><img src="docs/usage.svg" alt="Mock-up of the comeback-cost row on its own, using the text the mod writes" width="860"></p>
 
 <p align="center"><sub>Mock-up with the text the mod writes. The row itself was tested live using a copy with a 20-second cache lifetime.</sub></p>
 
@@ -20,16 +20,16 @@ Come back after a long break and one short message can rewrite your whole conver
 In a terminal, inside Claude Code:
 
 ```
-/plugin install cold-cache --marketplace YlitaloJuha/claude-cold-cache
+/plugin install comeback-cost --marketplace YlitaloJuha/claude-comeback-cost
 ```
 
 Or from a shell:
 
 ```bash
-claude plugin install cold-cache --marketplace YlitaloJuha/claude-cold-cache
+claude plugin install comeback-cost --marketplace YlitaloJuha/claude-comeback-cost
 ```
 
-In the desktop app, click + next to the prompt box, then Plugins, Add marketplace with `YlitaloJuha/claude-cold-cache`, then Add plugin.
+In the desktop app, click + next to the prompt box, then Plugins, Add marketplace with `YlitaloJuha/claude-comeback-cost`, then Add plugin.
 
 > [!NOTE]
 > This repository is private for now. Installing needs read access and a GitHub credential on your machine, such as `gh auth login` then `gh auth setup-git`.
@@ -70,7 +70,7 @@ Once it is loaded, ask your own Claude to fit it to how you work, for example to
 ## Credits
 
 - The idea and the timing rules come from [cache-tax](https://github.com/karanb192/cache-tax) by Karan Bansal (MIT), see `LICENSE-cache-tax`. This is the warn-only version. If you want the cache kept warm as well, use cache-tax.
-- Not related to [mrkshw/cold-cache](https://github.com/mrkshw/cold-cache) by Mark Shaw (MIT), a separate mod with the same name and a similar warning. That one also offers a Haiku handoff or compaction. This mod was not built from it.
+- A nod to [mrkshw/cold-cache](https://github.com/mrkshw/cold-cache) by Mark Shaw (MIT). It got there first, on 2026-10-11, with a similar warning and the same name this mod started with. This mod nearly copy-catted it by accident, so it was renamed. It was not built from that code. If you also want a Haiku handoff or compaction, use that one.
 
 ## Try other mods together
 

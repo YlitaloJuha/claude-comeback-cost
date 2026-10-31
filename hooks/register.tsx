@@ -34,7 +34,7 @@ const INPUT_RATES: Array<[string | RegExp, number]> = [
 
 const FRESH: Cache = { lastRequestAt: 0, context: 0, model: null, resumedAt: 0, resumeUsd: null }
 
-const cache = atom({ plugin: 'cold-cache', key: 'cache' } as const, FRESH)
+const cache = atom({ plugin: 'comeback-cost', key: 'cache' } as const, FRESH)
 
 export function writeRate(model: string | null, tokens: number): number | null {
   const id = (model ?? '').toLowerCase().replace(/[\s.]+/g, '-')

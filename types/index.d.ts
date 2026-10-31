@@ -12,6 +12,6 @@ export type Cache = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'cold-cache': { cache: Cache }
+    'comeback-cost': { cache: Cache }
   }
 }
