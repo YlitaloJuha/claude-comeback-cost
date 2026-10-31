@@ -8,7 +8,7 @@
   <img alt="tests: 10 passing" src="https://img.shields.io/badge/tests-10%20passing-2ea44f?style=flat-square">
 </p>
 
-<p align="center"><img src="docs/usage.svg" alt="Mock-up of the cold cache row, using the text the mod writes" width="860"></p>
+<p align="center"><img src="docs/usage.svg" alt="Mock-up of the cold cache row on its own, using the text the mod writes" width="860"></p>
 
 <p align="center"><sub>Mock-up: I could not wait out a real cold cache in a large session. The row text is what the mod writes.</sub></p>
 
