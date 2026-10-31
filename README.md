@@ -66,6 +66,10 @@ claude --plugin-dir .
 
 - The idea and the timing rules come from [cache-tax](https://github.com/karanb192/cache-tax) by Karan Bansal (MIT), see `LICENSE-cache-tax`. This is the warn-only version. If you want the cache kept warm as well, use cache-tax.
 
+## Try other mods together
+
+This mod works on its own, and it also works side by side with my other Claude Code mods. See [the full list on my profile](https://github.com/YlitaloJuha/YlitaloJuha#claude-code-mods).
+
 ## License and warranty
 
 [MIT](LICENSE). `LICENSE-cache-tax` covers the parts adapted from cache-tax.
