@@ -1,5 +1,6 @@
 {
   "name": "claude-comeback-cost",
+  "description": "See what your next message will cost before you send it, when the prompt cache has gone cold.",
   "owner": {
     "name": "Juha Ylitalo",
     "url": "https://github.com/YlitaloJuha"

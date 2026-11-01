@@ -68,7 +68,6 @@ export function coldLine(c: Cache, now: number): string | undefined {
     : `cache may be cold · next message up to ${formatUsd(usd)} (${tokens} tokens)`
 }
 
-let hasBand = false
 let timer: { cancel: () => void } | null = null
 
 // Redraws now, and again at the moment the cache goes cold.
@@ -77,8 +76,12 @@ async function refresh($: EngineInterface) {
   const now = await $.clock.now()
   timer?.cancel()
   timer = null
+  // Asked each time: the app joins the roster after session.start. The band is
+  // raised on terminal and desktop only, and an empty roster draws nowhere yet.
+  const surfaces = await $.session.surfaces()
+  const hasBand = surfaces.length === 0 || surfaces.some(s => s === 'terminal' || s === 'desktop')
+  $.ui.status(hasBand ? undefined : coldLine(c, now))
   if (hasBand) $.ui.invalidate('ui.render')
-  else $.ui.status(coldLine(c, now))
   const since = c.lastRequestAt || c.resumedAt
   if (since > 0 && since + TTL_MS > now) {
     timer = $.clock.after(since + TTL_MS - now, () => void refresh($))
@@ -88,16 +91,25 @@ async function refresh($: EngineInterface) {
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const result = await next(e)
-    hasBand = e.surface === 'terminal' || e.surface === 'desktop'
     const model = await $.session.model()
     const usage = await $.session.usage()
+    const now = await $.clock.now()
     const tokens = usage.context.tokens ?? 0
     await update($, cache, c => ({
       ...c,
       model: c.model ?? model,
       context: tokens || c.context,
-      resumedAt: c.lastRequestAt === 0 && tokens > 0 ? usage.startedAt : 0,
+      // This also runs on a reload, or when the mod is turned on mid-session, and
+      // nothing says when that session last sent a request. Count from here: a
+      // late warning beats a false one.
+      resumedAt: c.lastRequestAt === 0 && tokens > 0 ? c.resumedAt || now : 0,
     }))
+    await refresh($)
+    return result
+  })
+
+  on('session.attach', async ($, e, next) => {
+    const result = await next(e)
     await refresh($)
     return result
   })
@@ -135,6 +147,7 @@ export const register: Register = on => {
     if (!e.agentId) {
       const now = await $.clock.now()
       await update($, cache, c => ({ ...c, lastRequestAt: now, resumedAt: 0, resumeUsd: null }))
+      await refresh($)
     }
     return yield* next(e)
   })

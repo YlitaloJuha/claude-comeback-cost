@@ -1,5 +1,5 @@
 import { expect, mock, test } from 'claude-code/testing'
-import type { On, RenderPropsOf, SessionStartInput, TurnCompleteInput, TurnUsage } from 'claude-code'
+import type { On, RenderPropsOf, RenderSurface, SessionStartInput, TurnCompleteInput, TurnUsage } from 'claude-code'
 
 import { coldLine, writeRate } from '../hooks/register'
 
@@ -15,10 +15,12 @@ type AnsweredTurn = Exclude<TurnCompleteInput, { reason: 'refusal' }>
 let turns = 0
 const turn = (over: Partial<AnsweredTurn> = {}): TurnCompleteInput => ({ answer: 'ok', durationMs: 1000, isAborted: false, turnId: 't' + ++turns, reason: 'answer', usage, ...over })
 
-function world(on: On, live: { tokens?: number } = { tokens: CONTEXT }) {
-  const blocked = { submits: 0, models: 0 }
+function world(on: On, live: { tokens?: number; surfaces?: RenderSurface[] } = { tokens: CONTEXT }) {
+  const blocked = { submits: 0, models: 0, statuses: [] as Array<string | undefined> }
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('session.end', ($, e) => ({ sessionId: e.sessionId }))
+  on('session.attach', ($, e) => ({ clientId: e.clientId }))
+  on('session.surfaces', () => ({ value: live.surfaces ?? [] }))
   on('session.model', () => ({ value: 'claude-opus-5-5' }))
   on('session.usage', () => ({ value: { startedAt: START, context: { window: 1000000, tokens: live.tokens }, rateLimits: [] } }))
   on('turn.complete', ($, e) => ({ text: e.answer }))
@@ -30,12 +32,13 @@ function world(on: On, live: { tokens?: number } = { tokens: CONTEXT }) {
   on('prompt.submit', ($, e) => { blocked.submits++; return { text: e.text } })
   on('model.fork', () => { blocked.models++; return { value: null as never } })
   on('model.complete', () => { blocked.models++; return { value: null as never } })
-  on('ui.status', () => ({ value: undefined }))
+  on('ui.status', ($, e) => { blocked.statuses.push(e.text); return { value: undefined } })
   on('ui.render', ($, e) => $.ui.resolve(e).Text({ children: ['beneath'] }))
   return blocked
 }
 
 const COLD = 'cache cold · next message about $1.60 (200k tokens)'
+const MAY_BE_COLD = 'cache may be cold · next message up to $1.60 (200k tokens)'
 
 test('the rates follow the model table', () => {
   expect(writeRate('claude-opus-5-5', CONTEXT)).toBe(8)
@@ -130,6 +133,80 @@ test('a resumed session with no last-response time may be cold after an hour', a
   expect(await ui.find({ type: 'Text', text: /cache/ })).toBeUndefined()
   await clock.advance(60 * MIN)
   expect((await ui.find({ type: 'Text', text: /cache/ }))?.text).toBe('cache may be cold · next message up to $1.60 (200k tokens)')
+})
+
+test('loaded into a session hours old, it counts from its load instead of guessing', async ($, on) => {
+  const clock = mock.clock(on, { now: START + 180 * MIN })
+  world(on)
+  await $.session.start(session)
+  const ui = await $.ui.mount({ plugin: 'comeback-cost', surface: 'desktop', component: 'AbovePrompt', props })
+  expect(await ui.find({ type: 'Text', text: /cache/ })).toBeUndefined()
+  await clock.advance(59 * MIN)
+  expect(await ui.find({ type: 'Text', text: /cache/ })).toBeUndefined()
+  await clock.advance(MIN)
+  expect((await ui.find({ type: 'Text', text: /cache/ }))?.text).toBe(MAY_BE_COLD)
+})
+
+test('a reload keeps the last request it saw', async ($, on) => {
+  const clock = mock.clock(on, { now: START })
+  world(on)
+  await $.session.start(session)
+  const ui = await $.ui.mount({ plugin: 'comeback-cost', surface: 'desktop', component: 'AbovePrompt', props })
+  await $.turn.complete(turn())
+  await clock.advance(30 * MIN)
+  await $.session.start(session)
+  expect(await ui.find({ type: 'Text', text: /cache/ })).toBeUndefined()
+  await clock.advance(30 * MIN)
+  expect((await ui.find({ type: 'Text', text: /cache/ }))?.text).toBe(COLD)
+})
+
+test('a reload before any request does not restart the count', async ($, on) => {
+  const clock = mock.clock(on, { now: START })
+  world(on)
+  await $.session.start(session)
+  const ui = await $.ui.mount({ plugin: 'comeback-cost', surface: 'desktop', component: 'AbovePrompt', props })
+  await clock.advance(30 * MIN)
+  await $.session.start(session)
+  await clock.advance(30 * MIN)
+  expect((await ui.find({ type: 'Text', text: /cache/ }))?.text).toBe(MAY_BE_COLD)
+})
+
+test('the app joins after the start, and the row is still all that shows', async ($, on) => {
+  const clock = mock.clock(on, { now: START })
+  const calls = world(on, { tokens: CONTEXT, surfaces: ['desktop'] })
+  await $.session.start({ ...session, surface: null })
+  const ui = await $.ui.mount({ plugin: 'comeback-cost', surface: 'desktop', component: 'AbovePrompt', props })
+  await $.turn.complete(turn())
+  await clock.advance(60 * MIN)
+  expect((await ui.find({ type: 'Text', text: /cache/ }))?.text).toBe(COLD)
+  expect(calls.statuses.filter(Boolean)).toEqual([])
+})
+
+for (const surface of ['vscode', 'mobile'] as const) {
+  test(`${surface} has no band, so it gets the status line until a request goes out`, async ($, on) => {
+    const clock = mock.clock(on, { now: START })
+    const calls = world(on, { tokens: CONTEXT, surfaces: [surface] })
+    await $.session.start({ ...session, surface: null })
+    await $.turn.complete(turn())
+    expect(calls.statuses.at(-1)).toBeUndefined()
+    await clock.advance(60 * MIN)
+    expect(calls.statuses.at(-1)).toBe(COLD)
+    for await (const c of $.turn.step({ turnId: 'next', index: 0, model: 'claude-opus-5-5', messageCount: 3 })) void c
+    expect(calls.statuses.at(-1)).toBeUndefined()
+  })
+}
+
+test('a phone that joins a cold session is told', async ($, on) => {
+  const clock = mock.clock(on, { now: START })
+  const live: { tokens: number; surfaces: RenderSurface[] } = { tokens: CONTEXT, surfaces: [] }
+  const calls = world(on, live)
+  await $.session.start({ ...session, surface: null })
+  await $.turn.complete(turn())
+  await clock.advance(120 * MIN)
+  expect(calls.statuses.filter(Boolean)).toEqual([])
+  live.surfaces = ['mobile']
+  await $.session.attach({ surface: 'mobile', clientId: 'phone' })
+  expect(calls.statuses.at(-1)).toBe(COLD)
 })
 
 test('a survey and a running turn hide the row', async ($, on) => {
